@@ -8,7 +8,7 @@
 
 WishReaper is a userscript that finds games on your Steam wishlist that you already own or can access through Steam Families, helping you clear out redundant entries.
 
-[**Install Userscript**](https://gist.github.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/WishReaper.user.js)
+[**Install Userscript**](https://gist.github.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/837cbe945befe51275bbfbcad1c392f9a9304b44/WishReaper.user.js)
 
 ## Overview
 
@@ -24,7 +24,7 @@ When running on your Steam wishlist page, WishReaper compares listed games again
 ## Setup
 
 1. **Requirements:** Install a browser extension that supports `GM_xmlhttpRequest` (such as Tampermonkey or Violentmonkey).
-2. **Installation:** Click here to [Install WishReaper from GitHub Gist](https://gist.github.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/WishReaper.user.js).
+2. **Installation:** Click here to [Install WishReaper from GitHub Gist](https://gist.github.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/837cbe945befe51275bbfbcad1c392f9a9304b44/WishReaper.user.js).
 3. **Configuration:** The script defaults to `/wishlist/id/Noah_BK`. Update both the `@match` rule and the `PROFILE_PATH` constant in the script header to match your Steam profile URL.
 4. **Execution:** Open your Steam wishlist while logged into your account.
 
