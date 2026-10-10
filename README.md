@@ -1,55 +1,40 @@
 # WishReaper
 
-Your backlog is big enough.
+> Your backlog is big enough.
 
-WishReaper is a userscript that finds games on your Steam wishlist that
-you already own or can access through Steam Families.
+WishReaper is a userscript that finds games on your Steam wishlist that you already own or can access through Steam Families, helping you clear out redundant entries.
 
-It previews exact AppID matches and lets you choose which entries to
-remove. Nothing is removed without your confirmation.
+## Overview
 
-## How it works
+When running on your Steam wishlist page, WishReaper compares listed games against your owned library and shared family games. It displays exact AppID matches so you can review and select which entries to clean up. Nothing is removed without explicit confirmation.
 
-The script loads your owned games and Steam Families library, then
-compares them against wishlist entries currently loaded on the page.
+### Features
 
-Select the matches you want to remove and click **Remove selected**.
-WishReaper asks for confirmation, uses Steam’s own removal controls,
-and checks your wishlist afterward to verify the removal.
-
-If Steam’s library data is incomplete, you can add AppIDs or Steam
-store links manually.
+* **Dual Library Checks:** Cross-references wishlist items with both your personal library and your Steam Families shared pool.
+* **Exact Matching:** Scans AppIDs directly from loaded wishlist entries to avoid false positives.
+* **Controlled Removal:** Select specific items to delete. WishReaper uses Steam's native removal controls and verifies that the item was successfully removed.
+* **Manual Entry Support:** Add custom AppIDs or store links manually if Steam's library lookup misses anything.
 
 ## Setup
 
-Install the script in a userscript manager that supports
-`GM_xmlhttpRequest`, then open your Steam wishlist while signed in.
-
-The current script is configured for `/wishlist/id/Noah_BK`.
-To use it with a different profile, update both the `@match` rule
-and the `PROFILE_PATH` constant to match your wishlist URL.
+1. **Requirements:** Install a browser extension that supports `GM_xmlhttpRequest` (such as Tampermonkey or Violentmonkey).
+2. **Configuration:** The script defaults to `/wishlist/id/Noah_BK`. Update both the `@match` rule and the `PROFILE_PATH` constant in the script header to match your Steam profile URL.
+3. **Execution:** Open your Steam wishlist while logged into your account.
 
 ## Usage
 
-Open your wishlist and let the library lookup finish. Click
-**Refresh preview** to scan the entries currently loaded on the page.
-
-Check the games you want to remove, click **Remove selected**,
-and review the confirmation before proceeding.
+1. Open your wishlist and allow the initial library lookup to complete.
+2. Click **Refresh preview** to scan the entries currently loaded on the page.
+3. Select the games you want to remove.
+4. Click **Remove selected** and review the confirmation prompt before proceeding.
 
 ## Limitations
 
-Only wishlist entries currently loaded on the page are scanned.
-Load more entries and refresh the preview as needed.
-
-Steam Families lookup relies on an undocumented endpoint and may
-stop working if Valve changes it.
-
-Family access is not ownership and can change. Consider whether you
-still want your own copy before removing a shared game.
-
-Removal depends on finding Steam’s native Remove control on the page.
+* **Page Loading:** WishReaper only scans wishlist items currently loaded in your DOM. For large wishlists, scroll down to load additional items and click **Refresh preview** again.
+* **Undocumented API:** Steam Families lookup uses an undocumented endpoint and could break if Valve updates their backend.
+* **Family Access vs. Ownership:** Shared games are not permanently owned. Removing a family-shared game from your wishlist means you will no longer have a reminder to buy your own copy if sharing ends.
+* **DOM Dependency:** Item removal depends on locating Steam's native removal element on the page.
 
 ## Disclaimer
 
-Unofficial project. Not affiliated with Valve or Steam.
+WishReaper is an unofficial open-source project and is not affiliated with, maintained by, or endorsed by Valve or Steam.
