@@ -66,3 +66,16 @@ test('automatic discovery does not depend on a diagnostic AppID preset', () => {
   assert.match(script, /addMatches\(wishlist\)/);
   assert.match(script, /diagnosisInput\.placeholder\s*=\s*'AppID'/);
 });
+
+test('Gist metadata uses stable links for install and updates', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const script = fs.readFileSync(path.join(__dirname, '..', 'WishReaper.user.js'), 'utf8');
+  const gistRaw = 'https://gist.githubusercontent.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/WishReaper.user.js';
+  assert.match(script, /^\/\/ @downloadURL\s+(.+)$/m);
+  assert.match(script, /^\/\/ @updateURL\s+(.+)$/m);
+  const download = script.match(/^\/\/ @downloadURL\s+(.+)$/m)[1].trim();
+  const update = script.match(/^\/\/ @updateURL\s+(.+)$/m)[1].trim();
+  assert.equal(download, gistRaw);
+  assert.equal(update, gistRaw);
+});
