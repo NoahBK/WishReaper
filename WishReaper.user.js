@@ -2,6 +2,8 @@
 // @name         WishReaper - Steam Wishlist Cleaner
 // @namespace    local.wishreaper
 // @version      0.7.0
+// @downloadURL  https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
+// @updateURL    https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
 // @description  Audit the complete Steam wishlist against your owned and playable Steam Families games before removing selected entries.
 // @match        https://store.steampowered.com/wishlist/id/Noah_BK*
 // @grant        GM_xmlhttpRequest
@@ -160,10 +162,10 @@
     return titles;
   }
 
-  async function getWishlist(steamId) {
-    const data = await gmJson('IWishlistService/GetWishlist/v1/', { steamid: steamId });
+  async function getWishlist(steamId, token) {
+    const data = await gmJson('IWishlistService/GetWishlist/v1/', { steamid: steamId, access_token: token });
     const ids = parseWishlist(data);
-    const count = await gmJson('IWishlistService/GetWishlistItemCount/v1/', { steamid: steamId });
+    const count = await gmJson('IWishlistService/GetWishlistItemCount/v1/', { steamid: steamId, access_token: token });
     const expected = Number(count?.response?.count);
     if (!Number.isSafeInteger(expected) || expected < 0) {
       throw new Error('Could not verify the total wishlist count.');
@@ -312,7 +314,7 @@
     message('Loading account, entire wishlist, and Steam Families library...');
     try {
       const { steamId, token } = await tokenAndSteamId();
-      const wishlist = await getWishlist(steamId);
+      const wishlist = await getWishlist(steamId, token);
       const titles = loadedTitles();
       // A mismatch may indicate a different wishlist owner or stale page state.
       if ([...titles.keys()].some(id => !wishlist.has(id))) {
@@ -385,7 +387,7 @@
     try {
       const identity = await tokenAndSteamId();
       if (identity.steamId !== current.steamId) throw new Error('Steam account changed since scan.');
-      const before = await getWishlist(current.steamId);
+      const before = await getWishlist(current.steamId, identity.token);
       if (items.some(item => !before.has(item.appId))) throw new Error('Wishlist changed since scan. Scan again.');
       for (const item of items) {
         try {
@@ -396,7 +398,7 @@
         }
         message('Removal requests processed: ' + (accepted.length + failed.length) + ' of ' + items.length + '.');
       }
-      const remaining = await getWishlist(current.steamId);
+      const remaining = await getWishlist(current.steamId, identity.token);
       const verified = accepted.filter(id => !remaining.has(id));
       const stillPresent = accepted.filter(id => remaining.has(id));
       if (stillPresent.length) failed.push('Steam still lists these AppIDs: ' + stillPresent.join(', '));
