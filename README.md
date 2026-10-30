@@ -6,42 +6,51 @@
 
 > Your backlog is big enough.
 
-WishReaper is a userscript that finds games on your Steam wishlist that you already own or can access through Steam Families, helping you clear out redundant entries.
+WishReaper is a Tampermonkey or Violentmonkey userscript that compares the complete Steam wishlist to games owned or playable through Steam Families. Exact AppIDs are used. Nothing is removed automatically.
 
-[**Install Userscript**](https://gist.github.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/837cbe945befe51275bbfbcad1c392f9a9304b44/WishReaper.user.js)
+## Install
 
-## Overview
+**Development version: 0.7.0**
 
-When running on your Steam wishlist page, WishReaper compares listed games against your owned library and shared family games. It displays exact AppID matches so you can review and select which entries to clean up. Nothing is removed without explicit confirmation.
+1. Install Tampermonkey or Violentmonkey.
+2. Open [the branch userscript](https://github.com/NoahBK/WishReaper/blob/fix/complete-wishlist-family-audit/WishReaper.user.js), click **Raw**, and install it in your userscript manager.
+3. Disable the old v0.6.0 Gist installation so only one copy runs.
+4. Open [the configured Steam wishlist](https://store.steampowered.com/wishlist/id/Noah_BK/?sort=price) while logged in and click **Scan complete wishlist**.
 
-### Features
+After merge, use this permanent installation and automatic update URL:
 
-* **Dual Library Checks:** Cross-references wishlist items with both your personal library and your Steam Families shared pool.
-* **Exact Matching:** Scans AppIDs directly from loaded wishlist entries to avoid false positives.
-* **Controlled Removal:** Select specific items to delete. WishReaper uses Steam's native removal controls and verifies that the item was successfully removed.
-* **Manual Entry Support:** Add custom AppIDs or store links manually if Steam's library lookup misses anything.
+https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
 
-## Setup
+The older installer linked to a commit-pinned Gist, so it cannot receive updates from this repository.
 
-1. **Requirements:** Install a browser extension that supports `GM_xmlhttpRequest` (such as Tampermonkey or Violentmonkey).
-2. **Installation:** Click here to [Install WishReaper from GitHub Gist](https://gist.github.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/837cbe945befe51275bbfbcad1c392f9a9304b44/WishReaper.user.js).
-3. **Configuration:** The script defaults to `/wishlist/id/Noah_BK`. Update both the `@match` rule and the `PROFILE_PATH` constant in the script header to match your Steam profile URL.
-4. **Execution:** Open your Steam wishlist while logged into your account.
+## Changes in v0.7.0
 
-## Usage
-
-1. Open your wishlist and allow the initial library lookup to complete.
-2. Click **Refresh preview** to scan the entries currently loaded on the page.
-3. Select the games you want to remove.
-4. Click **Remove selected** and review the confirmation prompt before proceeding.
+* Reads the full wishlist from Steam's IWishlistService/GetWishlist/v1/ instead of inspecting only currently rendered page items.
+* Checks the count with IWishlistService/GetWishlistItemCount/v1/ and refuses cleanup if the list appears incomplete.
+* Retrieves the Steam account token from Steam's own page configuration or authenticated points-summary endpoint. Tokens are not saved, displayed, or sent to third-party hosts.
+* Queries Steam Families with owned apps, excluded apps, and non-game entries included, so DLC and excluded family titles are not silently skipped.
+* Distinguishes personally owned, family playable, excluded, and unknown games.
+* Offers a per-AppID diagnostic field prefilled with CONTROL Resonant (AppID 3669870).
+* Allows manual AppIDs or Steam store links for exceptional cases. Manual entries are clearly marked unverified.
+* Requires explicit checkbox selection, a confirmation prompt, an account check, a fresh wishlist check, and post-removal verification.
 
 ## Limitations
 
-* **Page Loading:** WishReaper only scans wishlist items currently loaded in your DOM. For large wishlists, scroll down to load additional items and click **Refresh preview** again.
-* **Undocumented API:** Steam Families lookup uses an undocumented endpoint and could break if Valve updates their backend.
-* **Family Access vs. Ownership:** Shared games are not permanently owned. Removing a family-shared game from your wishlist means you will no longer have a reminder to buy your own copy if sharing ends.
-* **DOM Dependency:** Item removal depends on locating Steam's native removal element on the page.
+Steam Families is an undocumented API. Valve may change its response structure. Owning a title in a Steam Family does not guarantee a second account can play it. A temporary license, excluded title, or incomplete API response must not automatically trigger removal.
+
+The script is scoped to /wishlist/id/Noah_BK. If using a different wishlist, change both the metadata match rule and PROFILE_PATH, and ensure you are logged in as that wishlist's owner.
+
+This release has automated tests using simulated Steam API data, but has not been tested against your authenticated Steam account. Check the scan and diagnostics before deleting anything.
+
+## Development
+
+Run with Node.js:
+
+    node --check WishReaper.user.js
+    node --test tests/*.test.cjs
+
+A GitHub Actions workflow runs these checks on pull requests and changes to main.
 
 ## Disclaimer
 
-WishReaper is an unofficial open-source project and is not affiliated with, maintained by, or endorsed by Valve or Steam.
+WishReaper is unofficial and is not affiliated with Valve or Steam.
