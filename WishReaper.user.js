@@ -314,7 +314,11 @@
       const { steamId, token } = await tokenAndSteamId();
       const wishlist = await getWishlist(steamId);
       const titles = loadedTitles();
-      // Page rows are only a secondary label source; never use them to decide completeness.
+      // A mismatch may indicate a different wishlist owner or stale page state.
+      if ([...titles.keys()].some(id => !wishlist.has(id))) {
+        throw new Error('Visible wishlist entries do not match the signed-in account. No removals allowed.');
+      }
+      // Page rows are labels only; Steam's API is the authoritative complete list.
       const apps = await getFamily(token);
       const family = indexFamily(apps, steamId);
       current = { steamId, wishlist, titles, family, items: new Map() };
@@ -376,44 +380,41 @@
     scanButton.disabled = true;
     manualButton.disabled = true;
     removeButton.disabled = true;
-    let success = 0;
+    const accepted = [];
     const failed = [];
-    const originalAccount = current.steamId;
-    for (const item of items) {
-      try {
-        // Reject stale selections if the wishlist changed since the scan.
-        const before = await getWishlist(originalAccount);
-        if (!before.has(item.appId)) throw new Error('Already absent from Steam wishlist.');
-        await removeFromWishlist(item.appId, session);
-        selected.delete(item.appId);
-        current.items.delete(item.appId);
-        success++;
-      } catch (error) {
-        failed.push(item.appId + ': ' + error.message);
-      }
-      message('Removal requests completed: ' + (success + failed.length) + ' of ' + items.length + '.');
-    }
     try {
-      const remaining = await getWishlist(originalAccount);
-      const unverified = items.filter(item => !remaining.has(item.appId) === false && !failed.some(f => f.startsWith(item.appId + ':')));
-      if (unverified.length) {
-        failed.push('Steam still reports these AppIDs on the wishlist: ' + unverified.map(item => item.appId).join(', '));
+      const identity = await tokenAndSteamId();
+      if (identity.steamId !== current.steamId) throw new Error('Steam account changed since scan.');
+      const before = await getWishlist(current.steamId);
+      if (items.some(item => !before.has(item.appId))) throw new Error('Wishlist changed since scan. Scan again.');
+      for (const item of items) {
+        try {
+          await removeFromWishlist(item.appId, session);
+          accepted.push(item.appId);
+        } catch (error) {
+          failed.push(item.appId + ': ' + error.message);
+        }
+        message('Removal requests processed: ' + (accepted.length + failed.length) + ' of ' + items.length + '.');
       }
-      current.wishlist = remaining;
+      const remaining = await getWishlist(current.steamId);
+      const verified = accepted.filter(id => !remaining.has(id));
+      const stillPresent = accepted.filter(id => remaining.has(id));
+      if (stillPresent.length) failed.push('Steam still lists these AppIDs: ' + stillPresent.join(', '));
+      message(verified.length + ' confirmed removed, ' + failed.length + ' issue(s).' +
+        (failed.length ? '\n' + failed.join('\n') : ''), Boolean(failed.length));
     } catch (error) {
-      failed.push('Could not verify final wishlist: ' + error.message);
+      message('Stopped: ' + error.message + '. No further removal requests will be sent.', true);
+    } finally {
+      // A new scan is mandatory after any removal attempt.
+      busy = false;
+      current = null;
+      selected.clear();
+      scanButton.disabled = false;
+      manualButton.disabled = false;
+      selectionActions.hidden = true;
+      list.replaceChildren();
+      summary.textContent = 'Scan again to refresh Steam data before another removal.';
     }
-    busy = false;
-    scanButton.disabled = false;
-    manualButton.disabled = false;
-    draw();
-    message(success + ' removal request(s) accepted. ' +
-      (failed.length ? failed.length + ' issue(s):\n' + failed.join('\n') : 'Final wishlist check complete.') +
-      ' Refresh the scan before removing more.', Boolean(failed.length));
-    // Force a fresh library and wishlist scan before any additional removals.
-    current = null;
-    selected.clear();
-    selectionActions.hidden = true;
   }
 
   scanButton.addEventListener('click', scan);
