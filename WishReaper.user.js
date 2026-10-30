@@ -2,8 +2,8 @@
 // @name         WishReaper - Steam Wishlist Cleaner
 // @namespace    local.wishreaper
 // @version      0.7.1
-// @downloadURL  https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
-// @updateURL    https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
+// @downloadURL  https://gist.githubusercontent.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/WishReaper.user.js
+// @updateURL    https://gist.githubusercontent.com/NoahBK/555e821c91b5cdc4fa1a9b3cf5f6f1ce/raw/WishReaper.user.js
 // @description  Audit the complete Steam wishlist against your owned and playable Steam Families games before removing selected entries.
 // @match        https://store.steampowered.com/wishlist/id/Noah_BK*
 // @grant        GM_xmlhttpRequest
