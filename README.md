@@ -10,7 +10,7 @@ WishReaper is a Tampermonkey or Violentmonkey userscript that compares the compl
 
 ## Install
 
-**Development version: 0.7.0**
+**Development version: 0.7.1**
 
 1. Install Tampermonkey or Violentmonkey.
 2. Open [the branch userscript](https://github.com/NoahBK/WishReaper/blob/fix/complete-wishlist-family-audit/WishReaper.user.js), click **Raw**, and install it in your userscript manager.
@@ -23,14 +23,14 @@ https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
 
 The older installer linked to a commit-pinned Gist, so it cannot receive updates from this repository.
 
-## Changes in v0.7.0
+## Changes in v0.7.1
 
 * Reads the full wishlist from Steam's IWishlistService/GetWishlist/v1/ instead of inspecting only currently rendered page items.
 * Checks the count with IWishlistService/GetWishlistItemCount/v1/ and refuses cleanup if the list appears incomplete.
 * Retrieves the Steam account token from Steam's own page configuration or authenticated points-summary endpoint. Tokens are not saved, displayed, or sent to third-party hosts.
 * Queries Steam Families with owned apps, excluded apps, and non-game entries included, so DLC and excluded family titles are not silently skipped.
 * Distinguishes personally owned, family playable, excluded, and unknown games.
-* Offers a per-AppID diagnostic field prefilled with CONTROL Resonant (AppID 3669870).
+* Includes an optional, initially empty AppID diagnostic field. It does not affect automatic detection of wishlisted games.
 * Allows manual AppIDs or Steam store links for exceptional cases. Manual entries are clearly marked unverified.
 * Requires explicit checkbox selection, a confirmation prompt, an account check, a fresh wishlist check, and post-removal verification.
 
