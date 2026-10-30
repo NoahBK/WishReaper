@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WishReaper - Steam Wishlist Cleaner
 // @namespace    local.wishreaper
-// @version      0.7.0
+// @version      0.7.1
 // @downloadURL  https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
 // @updateURL    https://raw.githubusercontent.com/NoahBK/WishReaper/main/WishReaper.user.js
 // @description  Audit the complete Steam wishlist against your owned and playable Steam Families games before removing selected entries.
@@ -19,7 +19,6 @@
   const PROFILE_PATH = '/wishlist/id/Noah_BK';
   const PANEL_ID = 'wishreaper-panel';
   const LIMIT = 50000;
-  const TARGET_APPID = 3669870; // CONTROL Resonant: default diagnostic only, never forced removal.
 
   function validAppId(value) {
     const n = Number(value);
@@ -211,7 +210,7 @@
 
   const panel = element('section');
   panel.id = PANEL_ID;
-  const title = element('h3', '', 'WishReaper 0.7.0');
+  const title = element('h3', '', 'WishReaper 0.7.1');
   const summary = element('p', 'wr-muted', 'Nothing is removed without your selection and confirmation.');
   const actions = element('div');
   const scanButton = element('button', '', 'Scan complete wishlist');
@@ -219,9 +218,8 @@
   actions.append(scanButton, closeButton);
   const status = element('p', 'wr-muted', 'Ready.');
   const diagnostics = element('div');
-  const diagnosisLabel = element('p', '', 'Check an AppID (CONTROL Resonant is prefilled):');
+  const diagnosisLabel = element('p', '', 'Diagnose an AppID (optional):');
   const diagnosisInput = element('input');
-  diagnosisInput.value = String(TARGET_APPID);
   diagnosisInput.placeholder = 'AppID';
   diagnosisInput.setAttribute('aria-label', 'Diagnose Steam AppID');
   const diagnoseButton = element('button', '', 'Diagnose');
@@ -254,7 +252,7 @@
 
   function diagnostic(id) {
     if (!current) return 'Run a scan first.';
-    if (!id) return 'Enter a valid numeric AppID.';
+    if (!id) return 'Enter an AppID to inspect an individual game.';
     const result = classify(id, current.wishlist, current.family);
     const owners = current.family.get(id);
     return nameFor(id) + ' (' + id + '): ' + result +
