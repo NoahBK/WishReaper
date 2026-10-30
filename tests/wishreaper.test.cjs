@@ -57,3 +57,12 @@ test('unknown ownership cannot silently qualify a game for removal', () => {
   const family = indexFamily([{ appid: 3669870, name: 'CONTROL Resonant', exclude_reason: 0 }], me);
   assert.equal(classify(3669870, parseWishlist(wanted), family), 'Ownership not confirmed');
 });
+
+test('automatic discovery does not depend on a diagnostic AppID preset', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const script = fs.readFileSync(path.join(__dirname, '..', 'WishReaper.user.js'), 'utf8');
+  assert.doesNotMatch(script, /TARGET_APPID|diagnosisInput\.value\s*=/);
+  assert.match(script, /addMatches\(wishlist\)/);
+  assert.match(script, /diagnosisInput\.placeholder\s*=\s*'AppID'/);
+});
